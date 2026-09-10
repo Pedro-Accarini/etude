@@ -1,0 +1,53 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Bricolage Grotesque", "Public Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Public Sans", -apple-system, "Segoe UI", ui-sans-serif, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+
+  --color-bg: #0e0d0c;
+  --color-surface: #17150f;
+  --color-surface-2: #201d16;
+  --color-line: #2c2820;
+  --color-ink: #f3f1ec;
+  --color-ink-dim: #a89f8d;
+  --color-ink-faint: #6d6656;
+  --color-accent: #ffb238;
+  --color-accent-ink: #241a05;
+  --color-good: #59c289;
+  --color-warn: #e2604f;
+}
+
+:root[data-theme="light"] {
+  --color-bg: #f5f3ee;
+  --color-surface: #ffffff;
+  --color-surface-2: #edeadf;
+  --color-line: #e1dccc;
+  --color-ink: #1a1712;
+  --color-ink-dim: #6c6455;
+  --color-ink-faint: #a49b88;
+  --color-accent: #b36b00;
+  --color-accent-ink: #fff8ec;
+  --color-good: #257a51;
+  --color-warn: #b83f2c;
+}
+
+html, body, #root { height: 100%; }
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--color-accent); color: var(--color-accent-ink); }
+
+* { scrollbar-width: thin; scrollbar-color: var(--color-line) transparent; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: var(--color-line); border-radius: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
