@@ -3,11 +3,11 @@ import { Home, Library, Compass, MessagesSquare } from 'lucide-react'
 
 export type TabId = 'hoje' | 'repertorio' | 'teoria' | 'maestro'
 
-const TABS: { id: TabId; label: string; icon: typeof Home }[] = [
-  { id: 'hoje', label: 'Hoje', icon: Home },
-  { id: 'repertorio', label: 'Repertório', icon: Library },
-  { id: 'teoria', label: 'Teoria', icon: Compass },
-  { id: 'maestro', label: 'Maestro', icon: MessagesSquare },
+const TABS: { id: TabId; label: string; icon: typeof Home; color: string }[] = [
+  { id: 'hoje', label: 'Hoje', icon: Home, color: 'var(--color-accent)' },
+  { id: 'repertorio', label: 'Repertório', icon: Library, color: 'var(--color-accent-2)' },
+  { id: 'teoria', label: 'Teoria', icon: Compass, color: 'var(--color-good)' },
+  { id: 'maestro', label: 'Maestro', icon: MessagesSquare, color: 'var(--color-accent)' },
 ]
 
 export function BottomNav({ active, onChange }: { active: TabId; onChange: (t: TabId) => void }) {
@@ -27,13 +27,13 @@ export function BottomNav({ active, onChange }: { active: TabId; onChange: (t: T
                 onClick={() => onChange(tab.id)}
                 aria-current={isActive ? 'page' : undefined}
                 className="relative flex w-full flex-col items-center gap-1 py-2.5 text-[11px] font-medium"
-                style={{ color: isActive ? 'var(--color-ink)' : 'var(--color-ink-faint)' }}
+                style={{ color: isActive ? tab.color : 'var(--color-ink-faint)' }}
               >
                 {isActive && (
                   <motion.span
                     layoutId="nav-pill"
                     className="absolute top-0.5 h-8 w-8 rounded-full"
-                    style={{ background: 'var(--color-surface-2)' }}
+                    style={{ background: 'color-mix(in srgb, ' + tab.color + ' 16%, var(--color-surface-2))' }}
                     transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                   />
                 )}

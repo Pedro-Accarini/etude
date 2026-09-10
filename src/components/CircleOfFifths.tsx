@@ -18,10 +18,10 @@ export function CircleOfFifths() {
         const yInner = CENTER + R_INNER * Math.sin(angle)
         return (
           <g key={major}>
-            <text x={xOuter} y={yOuter} fontSize="13" fontWeight={700} textAnchor="middle" dominantBaseline="middle" fill="var(--color-ink)" fontFamily="var(--font-mono)">
+            <text x={xOuter} y={yOuter} fontSize="13" fontWeight={700} textAnchor="middle" dominantBaseline="middle" fill="var(--color-accent-2)" fontFamily="var(--font-mono)">
               {major}
             </text>
-            <text x={xInner} y={yInner} fontSize="10.5" textAnchor="middle" dominantBaseline="middle" fill="var(--color-ink-dim)" fontFamily="var(--font-mono)">
+            <text x={xInner} y={yInner} fontSize="10.5" textAnchor="middle" dominantBaseline="middle" fill="var(--color-accent)" fontFamily="var(--font-mono)">
               {CIRCLE_MINORS[i]}
             </text>
           </g>

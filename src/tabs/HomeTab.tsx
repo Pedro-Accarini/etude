@@ -163,7 +163,7 @@ export function HomeTab() {
           <button
             onClick={startTimer}
             className="flex items-center gap-2 rounded-full px-6 py-3 font-medium"
-            style={{ background: 'var(--color-accent)', color: 'var(--color-accent-ink)' }}
+            style={{ background: 'var(--gradient-brand)', color: 'var(--color-accent-ink)' }}
           >
             <Play size={18} fill="currentColor" /> Começar a praticar
           </button>
@@ -203,7 +203,7 @@ export function HomeTab() {
                   style={{
                     borderColor: done ? 'var(--color-good)' : 'var(--color-line)',
                     background: done ? 'var(--color-good)' : 'transparent',
-                    color: done ? '#0b1a12' : 'transparent',
+                    color: done ? 'var(--color-good-ink)' : 'transparent',
                   }}
                 >
                   <Check size={15} strokeWidth={3} />
@@ -253,7 +253,7 @@ export function HomeTab() {
                   aria-pressed={g.done}
                   aria-label={`Marcar meta "${g.text}" como concluída`}
                 >
-                  {g.done && <Check size={12} strokeWidth={3} color="#0b1a12" />}
+                  {g.done && <Check size={12} strokeWidth={3} color="var(--color-good-ink)" />}
                 </button>
                 <span className="flex-1 text-sm" style={{ color: g.done ? 'var(--color-ink-faint)' : 'var(--color-ink)', textDecoration: g.done ? 'line-through' : 'none' }}>
                   {g.text}
@@ -298,7 +298,7 @@ export function HomeTab() {
             whileTap={{ scale: 0.97 }}
             onClick={saveSession}
             className="rounded-xl py-3 text-center font-medium"
-            style={{ background: 'var(--color-accent)', color: 'var(--color-accent-ink)' }}
+            style={{ background: 'var(--gradient-brand)', color: 'var(--color-accent-ink)' }}
           >
             Salvar sessão
           </motion.button>

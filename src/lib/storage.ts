@@ -28,7 +28,6 @@ export interface Piece {
   title: string
   composer: string
   status: PieceStatus
-  sourceName: string
   sourceUrl: string
   addedAt: string
 }
@@ -52,6 +51,14 @@ export interface Goal {
   id: string
   text: string
   done: boolean
+}
+
+export function sourceLabel(url: string) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '')
+  } catch {
+    return url
+  }
 }
 
 export function uid() {
