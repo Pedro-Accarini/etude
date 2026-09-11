@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { ExternalLink, Send, Settings } from 'lucide-react'
+import { ExternalLink, Send, Settings, Trash2 } from 'lucide-react'
 import { askMentor, ClaudeApiError, type ChatMessage } from '../lib/claude'
 import { useLocalStorage } from '../lib/storage'
 
@@ -41,6 +41,7 @@ export function MaestroTab() {
       scrollToBottom()
     } catch (e) {
       setError(e instanceof ClaudeApiError ? e.message : 'Não consegui responder agora — tente de novo.')
+      if (e instanceof ClaudeApiError && e.status === 401) setShowSettings(true)
     } finally {
       setLoading(false)
     }
@@ -57,8 +58,9 @@ export function MaestroTab() {
         </header>
         <div className="rounded-2xl border p-4" style={{ background: 'var(--color-surface)', borderColor: 'var(--color-line)' }}>
           <p className="text-sm">
-            O Maestro usa a API da Anthropic diretamente do seu navegador — sua chave fica salva só neste
-            aparelho e cada pergunta é cobrada na sua própria conta.
+            O Maestro fala com a Anthropic direto do seu navegador. Sua chave fica salva só neste aparelho —
+            e cada pergunta é cobrada na sua conta da Anthropic, não pelo Étude. Você precisa de uma conta lá
+            com um cartão cadastrado.
           </p>
           <a
             href="https://console.anthropic.com/settings/keys"
@@ -93,13 +95,25 @@ export function MaestroTab() {
             Salvar chave
           </motion.button>
           {apiKey && (
-            <button
-              onClick={() => setShowSettings(false)}
-              className="mt-3 w-full rounded-xl border py-2.5 text-center text-sm"
-              style={{ borderColor: 'var(--color-line)', color: 'var(--color-ink-dim)' }}
-            >
-              Cancelar
-            </button>
+            <div className="mt-3 flex gap-2">
+              <button
+                onClick={() => setShowSettings(false)}
+                className="flex-1 rounded-xl border py-2.5 text-center text-sm"
+                style={{ borderColor: 'var(--color-line)', color: 'var(--color-ink-dim)' }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  setApiKey('')
+                  setShowSettings(false)
+                }}
+                className="flex items-center justify-center gap-1.5 rounded-xl border px-4 py-2.5 text-center text-sm"
+                style={{ borderColor: 'var(--color-warn)', color: 'var(--color-warn)' }}
+              >
+                <Trash2 size={14} /> Esquecer chave
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -112,7 +126,12 @@ export function MaestroTab() {
         <div>
           <h1 className="font-display text-xl font-semibold">Maestro</h1>
         </div>
-        <button onClick={() => setShowSettings(true)} aria-label="Configurações" style={{ color: 'var(--color-ink-faint)' }}>
+        <button
+          onClick={() => setShowSettings(true)}
+          aria-label="Configurações"
+          className="flex h-11 w-11 items-center justify-center"
+          style={{ color: 'var(--color-ink-dim)' }}
+        >
           <Settings size={19} />
         </button>
       </header>
@@ -195,7 +214,7 @@ export function MaestroTab() {
         <button
           type="submit"
           disabled={loading || !input.trim()}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full disabled:opacity-40"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full disabled:opacity-40"
           style={{ background: 'var(--color-accent)', color: 'var(--color-accent-ink)' }}
           aria-label="Enviar"
         >

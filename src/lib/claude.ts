@@ -48,16 +48,10 @@ export async function askMentor(apiKey: string, turns: ChatMessage[]): Promise<s
   }
 
   if (!res.ok) {
-    if (res.status === 401) throw new ClaudeApiError('Chave de API inválida ou expirada.', 401)
+    if (res.status === 401) throw new ClaudeApiError('Chave de API inválida ou expirada. Toque no ícone de configurações para trocar.', 401)
     if (res.status === 429) throw new ClaudeApiError('Muitas perguntas em pouco tempo — espere um instante.', 429)
-    let detail = ''
-    try {
-      const body = await res.json()
-      detail = body?.error?.message ?? ''
-    } catch {
-      /* ignore */
-    }
-    throw new ClaudeApiError(detail || `Falha ao falar com o maestro (código ${res.status}).`, res.status)
+    if (res.status >= 500) throw new ClaudeApiError('O servidor do maestro está fora do ar — tente de novo daqui a pouco.', res.status)
+    throw new ClaudeApiError('O maestro não conseguiu responder agora. Tente de novo em alguns instantes.', res.status)
   }
 
   const data = await res.json()

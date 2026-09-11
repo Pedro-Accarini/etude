@@ -6,11 +6,15 @@ export function BottomSheet({
   onClose,
   title,
   children,
+  dismissible = true,
 }: {
   open: boolean
   onClose: () => void
   title: string
   children: ReactNode
+  /** Set false for a sheet whose action has a side effect on close (e.g. saving) —
+   * disables tap-outside so it only closes via an explicit button. */
+  dismissible?: boolean
 }) {
   return (
     <AnimatePresence>
@@ -21,7 +25,7 @@ export function BottomSheet({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={dismissible ? onClose : undefined}
           />
           <motion.div
             role="dialog"

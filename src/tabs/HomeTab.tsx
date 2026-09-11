@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { motion } from 'framer-motion'
-import { Check, Pause, Play, Plus, Trash2, X } from 'lucide-react'
+import { Check, Play, Plus, Square, Trash2, X } from 'lucide-react'
 import { BottomSheet } from '../components/BottomSheet'
+import { computeStreak, weekCount, weekSeconds } from '../lib/streak'
 import {
   DEFAULT_EXERCISES,
-  daysAgoISO,
   todayISO,
   uid,
   useLocalStorage,
@@ -23,33 +23,6 @@ function formatElapsed(sec: number) {
   return `${m}:${s}`
 }
 
-function computeStreak(sessions: PracticeSession[]) {
-  const dates = new Set(sessions.map((s) => s.date))
-  let cursor = todayISO()
-  if (!dates.has(cursor)) {
-    cursor = daysAgoISO(1)
-    if (!dates.has(cursor)) return 0
-  }
-  let streak = 0
-  for (let i = 0; i < 400 && dates.has(cursor); i++) {
-    streak++
-    const d = new Date(cursor + 'T00:00:00')
-    d.setDate(d.getDate() - 1)
-    cursor = d.toISOString().slice(0, 10)
-  }
-  return streak
-}
-
-function weekSeconds(sessions: PracticeSession[]) {
-  const since = daysAgoISO(6)
-  return sessions.filter((s) => s.date >= since).reduce((sum, s) => sum + s.durationSec, 0)
-}
-
-function weekCount(history: string[]) {
-  const since = daysAgoISO(6)
-  return history.filter((d) => d >= since).length
-}
-
 export function HomeTab() {
   const [sessions, setSessions] = useLocalStorage<PracticeSession[]>('etude:practice', [])
   const [exercises, setExercises] = useLocalStorage<Exercise[]>('etude:exercises', DEFAULT_EXERCISES)
@@ -61,6 +34,7 @@ export function HomeTab() {
   const [note, setNote] = useState('')
   const [focus, setFocus] = useState<string[]>([])
   const [goalText, setGoalText] = useState('')
+  const [exerciseText, setExerciseText] = useState('')
   const startedAt = useRef<number | null>(null)
   const pendingDuration = useRef(0)
 
@@ -111,10 +85,11 @@ export function HomeTab() {
     )
   }
 
-  function addExercise() {
-    const name = prompt('Nome do exercício:')
-    if (!name?.trim()) return
-    setExercises((prev) => [...prev, { id: uid(), name: name.trim(), target: 'diária', history: [] }])
+  function addExercise(e: FormEvent) {
+    e.preventDefault()
+    if (!exerciseText.trim()) return
+    setExercises((prev) => [...prev, { id: uid(), name: exerciseText.trim(), target: 'diária', history: [] }])
+    setExerciseText('')
   }
 
   function removeExercise(id: string) {
@@ -173,48 +148,69 @@ export function HomeTab() {
             className="flex items-center gap-2 rounded-full border px-6 py-3 font-medium"
             style={{ borderColor: 'var(--color-line)' }}
           >
-            <Pause size={18} /> Concluir sessão
+            <Square size={16} fill="currentColor" /> Concluir sessão
           </button>
         )}
       </div>
 
       {/* Exercises */}
       <section>
-        <div className="mb-2 flex items-center justify-between">
-          <h2 className="font-display text-sm font-semibold text-[var(--color-ink-dim)] uppercase tracking-wide">Exercícios de hoje</h2>
-          <button onClick={addExercise} className="text-xs font-medium" style={{ color: 'var(--color-accent)' }}>
-            + adicionar
+        <h2 className="mb-2 font-display text-sm font-semibold text-[var(--color-ink-dim)] uppercase tracking-wide">Exercícios de hoje</h2>
+        <form onSubmit={addExercise} className="mb-2 flex gap-2">
+          <input
+            value={exerciseText}
+            onChange={(e) => setExerciseText(e.target.value)}
+            placeholder="Ex.: Escalas de Ré Maior"
+            className="flex-1 rounded-xl border px-3 py-2 text-sm outline-none"
+            style={{ background: 'var(--color-surface)', borderColor: 'var(--color-line)' }}
+          />
+          <button
+            type="submit"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border"
+            style={{ borderColor: 'var(--color-line)' }}
+            aria-label="Adicionar exercício"
+          >
+            <Plus size={17} />
           </button>
-        </div>
+        </form>
         <ul className="flex flex-col gap-1.5">
           {exercises.map((ex) => {
             const done = ex.history.includes(todayISO())
             return (
               <li
                 key={ex.id}
-                className="group flex items-center gap-3 rounded-2xl border px-3 py-2.5"
+                className="flex items-center gap-1 rounded-2xl border pr-1 pl-1"
                 style={{ background: 'var(--color-surface)', borderColor: 'var(--color-line)' }}
               >
                 <button
                   onClick={() => toggleExercise(ex.id)}
                   aria-pressed={done}
                   aria-label={`Marcar ${ex.name} como praticado hoje`}
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border transition-colors"
-                  style={{
-                    borderColor: done ? 'var(--color-good)' : 'var(--color-line)',
-                    background: done ? 'var(--color-good)' : 'transparent',
-                    color: done ? 'var(--color-good-ink)' : 'transparent',
-                  }}
+                  className="flex h-11 w-11 shrink-0 items-center justify-center"
                 >
-                  <Check size={15} strokeWidth={3} />
+                  <span
+                    className="flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
+                    style={{
+                      borderColor: done ? 'var(--color-good)' : 'var(--color-line)',
+                      background: done ? 'var(--color-good)' : 'transparent',
+                      color: done ? 'var(--color-good-ink)' : 'transparent',
+                    }}
+                  >
+                    <Check size={15} strokeWidth={3} />
+                  </span>
                 </button>
-                <div className="min-w-0 flex-1">
+                <div className="min-w-0 flex-1 py-1">
                   <p className="truncate text-sm font-medium">{ex.name}</p>
-                  <p className="text-xs" style={{ color: 'var(--color-ink-faint)' }}>
+                  <p className="text-xs" style={{ color: 'var(--color-ink-dim)' }}>
                     meta {ex.target} · <span className="font-mono">{weekCount(ex.history)}x</span> essa semana
                   </p>
                 </div>
-                <button onClick={() => removeExercise(ex.id)} className="shrink-0 opacity-0 group-hover:opacity-100" style={{ color: 'var(--color-warn)' }} aria-label="Remover exercício">
+                <button
+                  onClick={() => removeExercise(ex.id)}
+                  className="flex h-11 w-11 shrink-0 items-center justify-center"
+                  style={{ color: 'var(--color-warn)' }}
+                  aria-label="Remover exercício"
+                >
                   <X size={15} />
                 </button>
               </li>
@@ -234,31 +230,45 @@ export function HomeTab() {
             className="flex-1 rounded-xl border px-3 py-2 text-sm outline-none"
             style={{ background: 'var(--color-surface)', borderColor: 'var(--color-line)' }}
           />
-          <button type="submit" className="flex items-center justify-center rounded-xl border px-3" style={{ borderColor: 'var(--color-line)' }} aria-label="Adicionar meta">
+          <button
+            type="submit"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border"
+            style={{ borderColor: 'var(--color-line)' }}
+            aria-label="Adicionar meta"
+          >
             <Plus size={17} />
           </button>
         </form>
         {goals.length === 0 ? (
-          <p className="rounded-xl border border-dashed px-3 py-3 text-xs" style={{ borderColor: 'var(--color-line)', color: 'var(--color-ink-faint)' }}>
+          <p className="rounded-xl border border-dashed px-3 py-3 text-xs" style={{ borderColor: 'var(--color-line)', color: 'var(--color-ink-dim)' }}>
             Nenhuma meta ainda.
           </p>
         ) : (
-          <ul className="flex flex-col gap-1">
+          <ul className="flex flex-col gap-0.5">
             {goals.map((g) => (
-              <li key={g.id} className="flex items-center gap-2 py-1.5">
+              <li key={g.id} className="flex items-center gap-1">
                 <button
                   onClick={() => toggleGoal(g.id)}
-                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border"
-                  style={{ borderColor: g.done ? 'var(--color-good)' : 'var(--color-line)', background: g.done ? 'var(--color-good)' : 'transparent' }}
+                  className="flex h-11 w-11 shrink-0 items-center justify-center"
                   aria-pressed={g.done}
                   aria-label={`Marcar meta "${g.text}" como concluída`}
                 >
-                  {g.done && <Check size={12} strokeWidth={3} color="var(--color-good-ink)" />}
+                  <span
+                    className="flex h-5 w-5 items-center justify-center rounded-full border"
+                    style={{ borderColor: g.done ? 'var(--color-good)' : 'var(--color-line)', background: g.done ? 'var(--color-good)' : 'transparent' }}
+                  >
+                    {g.done && <Check size={12} strokeWidth={3} color="var(--color-good-ink)" />}
+                  </span>
                 </button>
-                <span className="flex-1 text-sm" style={{ color: g.done ? 'var(--color-ink-faint)' : 'var(--color-ink)', textDecoration: g.done ? 'line-through' : 'none' }}>
+                <span className="flex-1 text-sm" style={{ color: g.done ? 'var(--color-ink-dim)' : 'var(--color-ink)', textDecoration: g.done ? 'line-through' : 'none' }}>
                   {g.text}
                 </span>
-                <button onClick={() => removeGoal(g.id)} aria-label="Remover meta" style={{ color: 'var(--color-ink-faint)' }}>
+                <button
+                  onClick={() => removeGoal(g.id)}
+                  className="flex h-11 w-11 shrink-0 items-center justify-center"
+                  style={{ color: 'var(--color-ink-dim)' }}
+                  aria-label="Remover meta"
+                >
                   <Trash2 size={14} />
                 </button>
               </li>
@@ -267,7 +277,7 @@ export function HomeTab() {
         )}
       </section>
 
-      <BottomSheet open={sheetOpen} onClose={saveSession} title={`Sessão de ${formatElapsed(pendingDuration.current)}`}>
+      <BottomSheet open={sheetOpen} onClose={saveSession} dismissible={false} title={`Você praticou ${formatElapsed(pendingDuration.current)}`}>
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap gap-2">
             {FOCUS_OPTIONS.map((f) => {

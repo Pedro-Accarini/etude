@@ -65,14 +65,24 @@ export function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8)
 }
 
+function pad2(n: number) {
+  return n.toString().padStart(2, '0')
+}
+
+// Local calendar date, not UTC — toISOString() would roll over to the
+// next day for anyone west of UTC in the evening (e.g. Brazil, UTC-3).
+function localISO(d: Date) {
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`
+}
+
 export function todayISO() {
-  return new Date().toISOString().slice(0, 10)
+  return localISO(new Date())
 }
 
 export function daysAgoISO(n: number) {
   const d = new Date()
   d.setDate(d.getDate() - n)
-  return d.toISOString().slice(0, 10)
+  return localISO(d)
 }
 
 export const DEFAULT_EXERCISES: Exercise[] = [

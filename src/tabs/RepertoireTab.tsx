@@ -56,7 +56,7 @@ export function RepertoireTab() {
               <h2 className="font-display text-sm font-semibold uppercase tracking-wide" style={{ color: 'var(--color-ink-dim)' }}>
                 {lane.label}
               </h2>
-              <span className="font-mono text-xs" style={{ color: 'var(--color-ink-faint)' }}>
+              <span className="font-mono text-xs" style={{ color: 'var(--color-ink-dim)' }}>
                 {items.length}
               </span>
             </div>
@@ -75,7 +75,7 @@ export function RepertoireTab() {
                     </p>
                   )}
                   {p.sourceUrl && (
-                    <span className="mt-auto flex items-center gap-1 pt-1 text-[11px]" style={{ color: 'var(--color-ink-faint)' }}>
+                    <span className="mt-auto flex items-center gap-1 pt-1 text-[11px]" style={{ color: 'var(--color-ink-dim)' }}>
                       <ExternalLink size={10} /> {sourceLabel(p.sourceUrl)}
                     </span>
                   )}
@@ -98,7 +98,7 @@ export function RepertoireTab() {
         <h2 className="mb-2 font-display text-sm font-semibold uppercase tracking-wide" style={{ color: 'var(--color-ink-dim)' }}>
           Onde encontrar partituras
         </h2>
-        <p className="mb-3 text-xs" style={{ color: 'var(--color-ink-faint)' }}>
+        <p className="mb-3 text-xs" style={{ color: 'var(--color-ink-dim)' }}>
           Domínio público é grátis; obra recente tem direito autoral — compre a edição.
         </p>
         <div className="grid grid-cols-2 gap-2">
@@ -112,7 +112,7 @@ export function RepertoireTab() {
               style={{ borderColor: 'var(--color-line)' }}
             >
               <span className="flex items-center gap-1 text-xs font-medium">
-                {s.name} <ExternalLink size={10} style={{ color: 'var(--color-ink-faint)' }} />
+                {s.name} <ExternalLink size={10} style={{ color: 'var(--color-ink-dim)' }} />
               </span>
               <p className="mt-0.5 text-[11px]" style={{ color: 'var(--color-ink-dim)' }}>
                 {s.desc}
@@ -166,7 +166,7 @@ function AddSheet({
           className="rounded-xl border px-3 py-2.5 text-sm outline-none"
           style={{ background: 'var(--color-surface-2)', borderColor: 'var(--color-line)' }}
         />
-        <p className="text-xs" style={{ color: 'var(--color-ink-faint)' }}>
+        <p className="text-xs" style={{ color: 'var(--color-ink-dim)' }}>
           Compositor e status você ajusta depois, tocando na peça.
         </p>
         <motion.button
@@ -223,6 +223,8 @@ function EditForm({
     onSave(piece.id, { title: title.trim(), composer: composer.trim(), status, sourceUrl: sourceUrl.trim() })
   }
 
+  const activeLane = LANES.find((l) => l.status === status)!
+
   return (
     <div className="flex flex-col gap-3">
       <input
@@ -261,7 +263,7 @@ function EditForm({
         whileTap={{ scale: 0.97 }}
         onClick={save}
         className="rounded-xl py-3 text-center font-medium"
-        style={{ background: 'var(--gradient-brand)', color: 'var(--color-accent-ink)' }}
+        style={{ background: activeLane.color, color: activeLane.ink }}
       >
         Salvar
       </motion.button>
