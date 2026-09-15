@@ -8,7 +8,7 @@ const SUGGESTIONS = [
   'Como leio a clave de Fá sem travar?',
   'Como monto o acorde de Sol maior e sua inversão?',
   'Onde encontro uma partitura fácil e legal do Für Elise?',
-  'Como uso o metrônomo para praticar escalas devagar?',
+  'Qual é a estrutura clássica de uma música pop?',
 ]
 
 export function MaestroTab() {
@@ -53,7 +53,7 @@ export function MaestroTab() {
         <header>
           <h1 className="font-display text-2xl font-semibold text-balance">Maestro</h1>
           <p className="mt-1 text-sm" style={{ color: 'var(--color-ink-dim)' }}>
-            Um mentor de piano para tirar dúvidas de teoria, técnica e partituras.
+            Um mentor musical para dúvidas de piano, teoria, harmonia, estrutura de composição e partituras.
           </p>
         </header>
         <div className="rounded-2xl border p-4" style={{ background: 'var(--color-surface)', borderColor: 'var(--color-line)' }}>
@@ -139,7 +139,7 @@ export function MaestroTab() {
       <div ref={logRef} className="flex-1 space-y-3 overflow-y-auto pr-0.5">
         {turns.length === 0 && (
           <div className="rounded-2xl border p-3 text-sm" style={{ background: 'var(--color-surface)', borderColor: 'var(--color-line)' }}>
-            Oi! Pode perguntar sobre teoria, técnica ou onde achar a partitura de uma peça.
+            Oi! Pode perguntar sobre piano, teoria, harmonia, estrutura de uma música ou onde achar uma partitura.
           </div>
         )}
         {turns.map((t, i) => (
